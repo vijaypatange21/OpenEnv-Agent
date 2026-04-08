@@ -1,4 +1,5 @@
 ---
+<<<<<<< HEAD
 title: OpenEnv Support Triage
 emoji: "🚑"
 colorFrom: blue
@@ -198,3 +199,15 @@ curl http://localhost:7860/state
 - Graders are rule-based and deterministic.
 - Scenario selection is deterministic by cursor unless a seed is provided.
 - Baseline script uses fixed temperature and fixed reset seed.
+=======
+title: Meta
+emoji: 🦀
+colorFrom: blue
+colorTo: gray
+sdk: docker
+pinned: false
+short_description: 'for meta hackathon '
+---
+
+Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+>>>>>>> 427a3233cc511595c87233605ed0d1b20444c685
