@@ -8,9 +8,11 @@ import requests
 from openai import OpenAI
 
 OPENENV_URL = os.getenv("OPENENV_URL", "http://localhost:7860")
-API_BASE_URL = os.getenv("API_BASE_URL")
-MODEL_NAME = os.getenv("MODEL_NAME")
-API_KEY = os.getenv("OPENAI_API_KEY") or os.getenv("HF_TOKEN") or "dummy"
+API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
+MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
+HF_TOKEN = os.getenv("HF_TOKEN")
+# Optional when the pipeline uses from_docker_image().
+LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
 TIMEOUT_SECONDS = 20
 
 TASKS = ["easy", "medium", "hard"]
@@ -105,6 +107,8 @@ def llm_action(client: OpenAI, task: str, observation: Dict[str, Any]) -> Option
 
 
 def run_episode(client: OpenAI, task: str) -> Dict[str, Any]:
+    print(json.dumps({"event": "START", "task": task}, sort_keys=True))
+
     reset_resp = requests.post(
         f"{OPENENV_URL}/reset",
         json={"task": task, "seed": 7},
@@ -135,20 +139,41 @@ def run_episode(client: OpenAI, task: str) -> Dict[str, Any]:
         last_info = payload["info"]
         steps += 1
 
+        print(
+            json.dumps(
+                {
+                    "event": "STEP",
+                    "task": task,
+                    "step": steps,
+                    "reward": payload["reward"]["value"],
+                    "latest_score": payload["info"]["latest_score"],
+                    "best_score": payload["info"]["best_score"],
+                    "done": done,
+                },
+                sort_keys=True,
+            )
+        )
+
     state_resp = requests.get(f"{OPENENV_URL}/state", timeout=TIMEOUT_SECONDS)
     state_resp.raise_for_status()
     state = state_resp.json()
 
-    return {
+    result = {
         "task": task,
         "steps": steps,
         "best_score": state["best_score"],
         "success": bool(last_info.get("success", False)),
     }
 
+    print(json.dumps({"event": "END", **result}, sort_keys=True))
+    return result
+
 
 def main() -> None:
-    client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+    if not HF_TOKEN:
+        raise RuntimeError("HF_TOKEN is required but not set.")
+
+    client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
 
     results = []
     for task in TASKS:
