@@ -1,12 +1,11 @@
 ---
-<<<<<<< HEAD
 title: OpenEnv Support Triage
 emoji: "🚑"
 colorFrom: blue
 colorTo: green
 sdk: docker
 app_port: 7860
----
+
 
 # OpenEnv Support Triage (FastAPI)
 
@@ -210,4 +209,3 @@ short_description: 'for meta hackathon '
 ---
 
 Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
->>>>>>> 427a3233cc511595c87233605ed0d1b20444c685
