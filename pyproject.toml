@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openenv-agent"
+version = "0.1.0"
+description = "OpenEnv support triage environment with FastAPI and baseline inference"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.116.1",
+  "uvicorn[standard]>=0.35.0",
+  "pydantic>=2.11.7",
+  "openai>=1.108.2",
+  "requests>=2.32.5",
+]
+
+[project.scripts]
+openenv-inference = "inference:main"
+openenv-validate = "validate_submission:main"
+
+[tool.setuptools]
+py-modules = ["inference", "validate_submission"]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
