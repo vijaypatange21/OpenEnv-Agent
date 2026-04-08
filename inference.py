@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional
 import requests
 from openai import OpenAI
 
-OPENENV_URL = os.getenv("OPENENV_URL", "http://localhost:7860")
+OPENENV_URL = os.getenv("OPENENV_URL", "https://vijaypatange21-meta.hf.space")
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.openai.com/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4.1-mini")
 HF_TOKEN = os.getenv("HF_TOKEN")
