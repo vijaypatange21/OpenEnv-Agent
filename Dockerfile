@@ -1,15 +1,32 @@
-FROM python:3.11-slim
+# syntax=docker/dockerfile:1.6
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+ARG BASE_IMAGE=ghcr.io/meta-pytorch/openenv-base:latest
+FROM ${BASE_IMAGE}
 
-WORKDIR /code
+WORKDIR /app/env
 
-COPY requirements.txt /code/requirements.txt
-RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r /code/requirements.txt
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git curl && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY . /code
+COPY . /app/env
 
-EXPOSE 7860
+RUN if ! command -v uv >/dev/null 2>&1; then \
+        curl -LsSf https://astral.sh/uv/install.sh | sh && \
+        mv /root/.local/bin/uv /usr/local/bin/uv && \
+        mv /root/.local/bin/uvx /usr/local/bin/uvx; \
+    fi
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ -f uv.lock ]; then \
+        uv sync --frozen --no-editable; \
+    else \
+        uv sync --no-editable; \
+    fi
+
+ENV PATH="/app/env/.venv/bin:$PATH"
+ENV PYTHONPATH="/app/env:$PYTHONPATH"
+
+EXPOSE 8000
+
+CMD ["sh", "-c", "uvicorn server.app:app --host 0.0.0.0 --port 8000"]

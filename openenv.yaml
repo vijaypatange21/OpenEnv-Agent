@@ -1,48 +1,12 @@
-name: openenv-support-triage
-version: 0.1.0
-description: >
-  Real-world customer support triage environment for training and evaluating agents on
-  routing, priority assignment, incident handling, and compliant response drafting.
-entrypoint:
-  type: http
-  base_url: http://localhost:7860
-api:
-  reset:
-    method: POST
-    path: /reset
-    request_model: ResetRequest
-    response_model: Observation
-  step:
-    method: POST
-    path: /step
-    request_model: Action
-    response_model: StepResult
-  state:
-    method: GET
-    path: /state
-    response_model: EnvState
-models:
-  Action: app.models.Action
-  Observation: app.models.Observation
-  Reward: app.models.Reward
-  StepResult: app.models.StepResult
-  EnvState: app.models.EnvState
-tasks:
-  - id: easy
-    title: Ticket Routing
-    grader: deterministic
-    score_range: [0.0, 1.0]
-  - id: medium
-    title: Routing + Action Planning
-    grader: deterministic
-    score_range: [0.0, 1.0]
-  - id: hard
-    title: Incident Triage + Response Draft
-    grader: deterministic
-    score_range: [0.0, 1.0]
-reward:
-  type: trajectory_shaped
-  notes:
-    - Rewards partial progress by comparing current score to prior best score.
-    - Penalizes repeated poor attempts and longer trajectories.
-    - Applies terminal bonus for successful completion.
+spec_version: 1
+name: scaler_env
+type: space
+runtime: fastapi
+app: server.app:app
+port: 8000
+description: "Customer-support triage environment with deterministic tasks and graded progress."
+tags:
+  - openenv
+  - support
+  - triage
+
